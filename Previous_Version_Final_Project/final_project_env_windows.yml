@@ -1,0 +1,43 @@
+name: dl_final
+channels: # defining channels
+  - huggingface # huggingface's channel for downloading all modules libraries related to huggingface for loading models, tokenizers and datasets
+  - pytorch # pytorch's channel for downloading torch for using and fine-tuning machine learning models
+  - conda-forge # the unofficial channel for downloading packages from anaconda
+  - nodefaults # excluding the default official channel of anaconda
+dependencies:
+  - python=3.11
+  - jupyterlab # used for working with notebooks in online environment
+  - notebook # jupyter notebook
+  - ipywidgets
+
+  # basics
+  - numpy # library for using arrays and using mathematical operations
+  - scipy # I am using it for calculating probabilites
+  - pandas # used for creating dataframes and editing them
+  - matplotlib # used for plots
+  - seaborn # used for more advanced plots
+
+  # sklearn
+  - scikit-learn # used for splitting data, using metrics and much more
+  - scikit-image
+
+
+  # huggingface
+  - transformers # transformers library
+  - tokenizers
+  - datasets
+  - sentencepiece
+
+  - pip
+  - pip:
+    # pytorch
+    - torch
+    - torchvision
+    - torchtext
+    - huggingface_hub[cli]
+    - pmdarima # used to correctly select the right ARMA or ARIMA model
+    - selenium==4.0.0 # used for webcrawling and webscraping
+    - xgboost
+    - tensorflow
+    - accelerate # used for training models
+    - openpyxl # used to import excel documents with pandas
