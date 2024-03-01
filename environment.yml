@@ -1,10 +1,14 @@
 ---
 name: final_project_schmidtfabian
-channels: [conda-forge, nodefaults]
+channels: [huggingface, pytorch, conda-forge, nodefaults]
 dependencies:
   - conda-lock
   - ipykernel
   - jupyterlab
+  - numpy
+  - scipy
+  - matplotlib
+  - seaborn
   - pandas
   - pip >=21.1
   - plotly>=5.13.0
@@ -18,7 +22,22 @@ dependencies:
   - python-graphviz
   - python=3.11
   - pyyaml
+  - scikit-learn
   - setuptools_scm
   - statsmodels
+  - transformers
+  - tokenizers
+  - datasets
+  - sentencepiece
   - toml
+  - requests-html
+  - beautifulsoup4
   - pip: [-e ., kaleido, pdbp]
+  - pip:
+      - tensorflow
+      - accelerate
+      - openpyxl
+      - pmdarima
+      - torch
+      - torchtext
+      - huggingface_hub[cli]
