@@ -6,7 +6,7 @@ pd.options.mode.copy_on_write = True
 pd.options.future.infer_string = True
 
 from final_project_schmidtfabian.config import BLD
-from final_project_schmidtfabian.analysis.analyze_sentiment_zero_classification import analyze_sentiment_zero_classification
+from final_project_schmidtfabian.analysis.analyze_sentiment_headlines import analyze_sentiment_zero_classification
 
 analyze_sentiment_deps = {
     "scripts": Path("clean_economic_activity_indicator.py"),

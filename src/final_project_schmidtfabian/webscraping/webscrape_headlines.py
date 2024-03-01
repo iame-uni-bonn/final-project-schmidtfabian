@@ -11,9 +11,11 @@ def webscrape_headlines_welt(starting_date, number_of_days):
     list_of_headlines = []
     headline_date = []
 
+    session = HTMLSession()
+
     for date in date_list_reformatted:
-        list_headlines = _collect_headlines_Welt(date=date)
-        list_headlines.append(list_headlines)
+        list_headlines = _collect_headlines_Welt(date=date, session=session)
+        list_of_headlines.append(list_headlines)
         headline_date.append(date)
     
     data = {
@@ -23,12 +25,10 @@ def webscrape_headlines_welt(starting_date, number_of_days):
     headline_dataframe = pd.DataFrame(data)
     headline_dataframe['headlines date'] = pd.to_datetime(headline_dataframe['headlines date'], dayfirst=True)
     headline_dataframe.set_index('headlines date', inplace=True)
-    headline_dataframe = headline_dataframe[::-1]
     return headline_dataframe
 
 
-def _collect_headlines_Welt(date):
-    session = HTMLSession()
+def _collect_headlines_Welt(date, session):
     url = f'https://www.welt.de/schlagzeilen/nachrichten-vom-{date}.html'
     response = session.get(url)
 
