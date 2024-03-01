@@ -44,5 +44,5 @@ def _fail_if_not_contain_column_values(dataframe):
     
 def _fail_if_wrong_datatype_column_values(dataframe):
     actual_dtype = dataframe["values"].dtype
-    if actual_dtype != pd.Float64Dtype:
+    if actual_dtype != "float64":
         raise ValueError(f"Column 'values' has dtype {actual_dtype}, expected pd.Float64Dtype.")

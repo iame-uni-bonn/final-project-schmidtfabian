@@ -6,7 +6,7 @@ pd.options.mode.copy_on_write = True
 pd.options.future.infer_string = True
 
 from final_project_schmidtfabian.config import BLD, SRC
-from final_project_schmidtfabian.data_management import clean_economic_activity_indicator
+from final_project_schmidtfabian.data_management.clean_economic_activity_indicator import clean_economic_activity_indicator
 
 import_economic_activity_deps = {
     "scripts": Path("clean_economic_activity_indicator.py"),
