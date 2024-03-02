@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 
-from final_project_schmidtfabian.data_management import detrend_economic_indicator
+from final_project_schmidtfabian.data_management.detrend_economic_indicator import detrend_economic_indicator
 
 WRONG_DTYPES = [5, 1.2, "hello", True, None, [1, 2, 3], {"a":1, "b":1}]
 
