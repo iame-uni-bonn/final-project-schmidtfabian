@@ -15,11 +15,11 @@ def clean_economic_activity_indicator(economic_indicator_dataframe):
     """
     _fail_if_wrong_dataframe(economic_indicator_dataframe)
     cleaned_data = economic_indicator_dataframe.copy(deep = True)
-    cleaned_data["Datum"] = pd.to_datetime(cleaned_data["Datum"], errors="raise")
+    cleaned_data["Datum"] = pd.to_datetime(cleaned_data["Datum"], errors="raise", dayfirst=True)
     cleaned_data.rename(columns={"Datum": 'date'}, inplace=True)
     cleaned_data.rename(columns={"Kalender- und saisonbereinigt (KSB)": "values"}, inplace=True)
     cleaned_data["values"]=pd.to_numeric(cleaned_data["values"], errors= "raise")
-    cleaned_data["values"] = cleaned_data["values"].astype(pd.Float64Dtype)
+    cleaned_data["values"] = cleaned_data["values"].astype(pd.Float64Dtype())
     cleaned_data.set_index('date', inplace=True)
     return cleaned_data
 
