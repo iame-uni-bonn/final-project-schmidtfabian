@@ -5,7 +5,8 @@ pd.options.future.infer_string = True
 
 def clean_economic_activity_indicator(economic_indicator_dataframe):
     """
-    This function cleans the dataframe containing the economic activity indicator used in the rest of the project. The function converts the columns into the right datatypes, renames columns and sets the right index.
+    Cleans the dataframe containing the economic activity indicator used in the rest of the project.
+    Converts the columns into the right datatypes, renames columns and sets the right index.
 
     Args:
     economic_indicator_dataframe(pd.Dataframe): A pandas dataframe containing the economic activity indicator.
@@ -25,12 +26,14 @@ def clean_economic_activity_indicator(economic_indicator_dataframe):
 
 
 def _fail_if_wrong_dataframe(dataframe):
+    """Throws an error if argument is not a pandas dataframe containing the correct columns."""
     _fail_if_not_pandas_dataframe(dataframe=dataframe)
     _fail_if_not_contains_columns(dataframe=dataframe)
 
 
 
 def _fail_if_not_pandas_dataframe(dataframe):
+    """Throws an error if argument is not a pandas Dataframe."""
     if not isinstance(dataframe,pd.DataFrame):
         current_datatype = type(dataframe)
         msg = (
@@ -41,7 +44,7 @@ def _fail_if_not_pandas_dataframe(dataframe):
         )
 
 def _fail_if_not_contains_columns(dataframe):
-    """ This function throws an error if the columns 'Datum' and 'Kalender- und saisonbereinigt (KSB)' are not contained in the dataframe."""
+    """Throws an error if the columns 'Datum' and 'Kalender- und saisonbereinigt (KSB)' are not contained in the dataframe."""
     missing_columns = [col for col in ["Datum", "Kalender- und saisonbereinigt (KSB)"] if col not in dataframe.columns]
     if missing_columns:
         raise ValueError(f"Columns {', '.join(missing_columns)} not found in the DataFrame.")
