@@ -2,6 +2,9 @@ import pytask
 import pandas as pd
 from sklearn.metrics import mean_squared_error
 
+pd.options.mode.copy_on_write = True
+pd.options.future.infer_string = True
+
 from final_project_schmidtfabian.config import SRC, BLD
 from final_project_schmidtfabian.final.write_value_to_file import write_value_to_file
 

@@ -69,17 +69,17 @@ def _fail_invalid_inputs(starting_date, number_of_days):
     _fail_if_starting_date_is_before_2008(starting_date=starting_date)
 
 def _fail_if_inputs_wrong_dtypes(starting_date, number_of_days):
-    if not isinstance(starting_date, datetime.datetime) and not isinstance(starting_date, int) and \
-        isinstance(starting_date, bool):
+    if not isinstance(starting_date, datetime) or not isinstance(number_of_days, int) or \
+        isinstance(number_of_days, bool):
         raise TypeError("'starting_date' must be a datetime object and 'number_of_days' date must be an integer")
     
 def _fail_if_number_of_days_out_of_reach(starting_date, number_of_days):
-    current_date = datetime.datetime.now().date()
-    last_date_headlines = starting_date + datetime.timedelta(days=number_of_days)
+    current_date = datetime.now()
+    last_date_headlines = starting_date + timedelta(days=number_of_days)
     if last_date_headlines > current_date:
         raise ValueError("The number of days are not reachable. Last date lies in the future.")
 
 def _fail_if_starting_date_is_before_2008(starting_date):
-    earliest_date = datetime.datetime(2008,1,1)
+    earliest_date = datetime(2008,1,1)
     if earliest_date > starting_date:
         raise ValueError("'starting date' must lie after the year 2007.")

@@ -20,4 +20,4 @@ def task_detrend_economic_indicator(
     """Detrends the economic activity indicator using the Hodrick-Prescott Filter."""
     cleaned_economic_indicator = pd.read_feather(depends_on["data"])
     detrended_data = detrend_economic_indicator(cleaned_economic_indicator)
-    detrend_economic_indicator.to_feather(produces)
+    detrended_data.to_feather(produces)
