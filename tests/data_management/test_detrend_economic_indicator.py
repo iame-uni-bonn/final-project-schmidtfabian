@@ -36,6 +36,9 @@ def test_detrend_economic_indicator_columns_wrong_dtypes():
 test_dictionary_no_deviations_from_trend =  {"date": ["25.02.2024", "26.02.2024", "27.02.2024"],
                                   "values":[100.0,100.0,100.0]}
 test_dataframe_no_deviations_from_trend = pd.DataFrame(test_dictionary_no_deviations_from_trend)
+test_dataframe_no_deviations_from_trend["values"] = test_dataframe_no_deviations_from_trend["values"].astype(
+    pd.Float64Dtype()
+)
 
 def test_detrend_economic_indicator_no_deviations():
     """Tests if trend values are all equal to actual values for no cyclical deviations."""
@@ -43,9 +46,14 @@ def test_detrend_economic_indicator_no_deviations():
     assert np.all(np.isclose(no_deviations_dataframe["trend_values"], 100.0, atol=0.01)) \
        and np.all(np.isclose(no_deviations_dataframe["cycle_values"], 0.0, atol=0.01)), \
        "Trend values should be approximately 100.0 and cycle values should be approximately 0."
+    
+test_dataframe_not_enough_elements = pd.DataFrame({"values":[100.0]})
+test_dataframe_not_enough_elements["values"] = test_dataframe_not_enough_elements["values"].astype(
+    pd.Float64Dtype()
+)
 
 def test_detrend_economic_indicator_not_enough_elements():
     """Tests if function raises an error if the number of elements in the column 'values' is too small."""
     with pytest.raises(ValueError):
-        detrend_economic_indicator(pd.DataFrame({"values":[100.0]}))
+        detrend_economic_indicator(test_dataframe_not_enough_elements)
 

@@ -48,8 +48,8 @@ def _fail_if_not_contain_column_values(dataframe):
 def _fail_if_wrong_datatype_column_values(dataframe):
     """Throws an error if the column 'values' in the argument does not have the correct data type."""
     actual_dtype = dataframe["values"].dtype
-    if actual_dtype != ("float64" or "int") or actual_dtype == "bool":
-        raise TypeError(f"Column 'values' has dtype {actual_dtype}, expected 'float64' or 'int'.")
+    if not isinstance(actual_dtype, pd.Float64Dtype):
+        raise TypeError(f"Column 'values' has dtype {actual_dtype}, expected 'pd.Float64Dtype'.")
 
 def _fail_if_column_values_not_enough_elements(dataframe):
     """Throws an error if the column 'values' has less than two elements."""
