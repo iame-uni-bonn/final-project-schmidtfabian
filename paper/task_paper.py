@@ -5,10 +5,12 @@ import pytask
 from pytask_latex import compilation_steps as cs
 from final_project_schmidtfabian.config import BLD, PAPER_DIR
 
-documents = ["final_project_schmidtfabian", "final_project_schmidtfabian_pres"]
+documents = ["final_project_schmidtfabian"]
 
 for document in documents:
 
+    @pytask.mark.skip()
+    @pytask.mark.try_last()
     @pytask.mark.latex(
         script=PAPER_DIR / f"{document}.tex",
         document=BLD / "latex" / f"{document}.pdf",
