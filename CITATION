@@ -1,5 +1,5 @@
 @Unpublished{final_project_schmidtfabian2024,
-    Title  = {This is the final project of the EPPE course from the master program in economics from the winter semester 2023/24 organized by the University of Bonn.},
+    Title  = {Revision of Forecasting economic activity using a text-classification model},
     Author = {Fabian Schmidt},
     Year   = {2024},
     Url    = {https://github.com/schmidtfabian/final_project_schmidtfabian}
