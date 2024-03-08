@@ -32,12 +32,10 @@ dependencies:
   - toml
   - requests-html
   - beautifulsoup4
-  - pip: [-e ., kaleido, pdbp]
-  - pip:
-      - tensorflow
-      - accelerate
-      - openpyxl
-      - pmdarima
-      - torch
-      - torchtext
-      - huggingface_hub[cli]
+  - accelerate
+  - openpyxl
+  - pmdarima
+  - pytorch
+  - torchtext
+  - huggingface_hub[cli]
+  - pip: [-e ., kaleido, pdbp, tensorflow]
