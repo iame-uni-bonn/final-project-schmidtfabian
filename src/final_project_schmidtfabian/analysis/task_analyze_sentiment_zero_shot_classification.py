@@ -13,10 +13,11 @@ analyze_sentiment_deps = {
     "data": BLD / "data" / "data_headlines.arrow",
 }
 
+@pytask.mark.skip()
 def task_analyze_sentiment(
         depends_on = analyze_sentiment_deps,
         produces = BLD / "data" / "headlines_sentiment_analyzed_zero_shot_classification.arrow"
         ):
     data_headlines = pd.read_feather(depends_on["data"])
-    data_headlines_sentiment_analyzed = analyze_sentiment_zero_classification(data_headlines)
+    data_headlines_sentiment_analyzed = analyze_sentiment_zero_classification(data_headlines["headlines in a list"][:30])
     data_headlines_sentiment_analyzed.to_feather(produces)

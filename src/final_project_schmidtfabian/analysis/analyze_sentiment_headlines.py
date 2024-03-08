@@ -1,5 +1,5 @@
 import pandas as pd
-from transformers import AutoTokenizer, TextClassificationPipeline, AutoModelForSequenceClassification, logging, TrainingArguments, Trainer
+from transformers import AutoTokenizer, TextClassificationPipeline, AutoModelForSequenceClassification
 import torch
 
 def analyze_sentiment_zero_classification(dataframe_headlines):
@@ -8,21 +8,26 @@ def analyze_sentiment_zero_classification(dataframe_headlines):
     model = AutoModelForSequenceClassification.from_pretrained("z-dickson/multilingual_sentiment_newspaper_headlines",
                                                                from_tf=True)
     location_headlines="headlines in a list"
-    dataframe_headlines_sentiment=_classify_sentiment(dataframe_headlines,model,tokenizer,location_headlines)
+    dataframe_headlines_sentiment=_classify_sentiment_zero_shot(dataframe=dataframe_headlines,
+                                                                model=model,
+                                                                tokenizer=tokenizer,
+                                                                column_to_analyze=location_headlines)
     return dataframe_headlines_sentiment
 
-def analyze_sentiment_finetuned_model(dataframe_headlines):
+def analyze_sentiment_finetuned_model(dataframe_headlines, location_finetuned_model):
     dataframe_headlines_sentiment = dataframe_headlines.copy(deep = True)
     tokenizer = AutoTokenizer.from_pretrained("z-dickson/multilingual_sentiment_newspaper_headlines")
-    model = AutoModelForSequenceClassification.from_pretrained("z-dickson/multilingual_sentiment_newspaper_headlines",
-                                                               from_tf=True)
+    model = AutoModelForSequenceClassification.from_pretrained(location_finetuned_model)
     location_headlines="headlines in a list"
-    dataframe_headlines_sentiment=_classify_sentiment(dataframe_headlines,model,tokenizer,location_headlines)
+    dataframe_headlines_sentiment=_classify_sentiment_finetuned(dataframe=dataframe_headlines,
+                                                                model=model,
+                                                                tokenizer=tokenizer,
+                                                                column_to_analyze=location_headlines)
     return dataframe_headlines_sentiment
     
 
 
-def _classify_sentiment(dataframe, model, tokenizer, column_to_analyze):
+def _classify_sentiment_zero_shot(dataframe, model, tokenizer, column_to_analyze):
     """Classifies the sentiment of a specified column of a dataframe into three categories: 'positive', 'negative' and 'neutral' using the specified model and tokenizer."""
     sentiment_classifier = TextClassificationPipeline(tokenizer=tokenizer,
                                                       model=model,
@@ -32,7 +37,26 @@ def _classify_sentiment(dataframe, model, tokenizer, column_to_analyze):
     dataframe_sentiment_analyzed = _create_sentiment_columns(dataframe=dataframe_sentiment_analyzed)
 
     for index in dataframe_sentiment_analyzed.index:
-        result=sentiment_classifier(dataframe_sentiment_analyzed.loc[index, column_to_analyze])
+        result=sentiment_classifier(dataframe_sentiment_analyzed.loc[index, column_to_analyze].tolist())
+        dataframe_sentiment_analyzed = _add_results_to_dataframe(dataframe=dataframe_sentiment_analyzed,result=result, index=index)
+    
+    dataframe_sentiment_analyzed['sentiment_score_per_element'] = dataframe_sentiment_analyzed['sentiment_score_per_element'].apply(_round_scores)
+
+    return dataframe_sentiment_analyzed
+
+def _classify_sentiment_finetuned(dataframe, model, tokenizer, column_to_analyze):
+    """Classifies the sentiment of a specified column of a dataframe into three categories: 'positive', 'negative' and 'neutral' using the specified model and tokenizer.
+    This classifier requires the model to be a pytorch model."""
+    sentiment_classifier = TextClassificationPipeline(tokenizer=tokenizer,
+                                                      model=model,
+                                                     device="cuda:0" if torch.cuda.is_available() else None,
+                                                     framework="pt")
+    
+    dataframe_sentiment_analyzed = dataframe.copy(deep = True)
+    dataframe_sentiment_analyzed = _create_sentiment_columns(dataframe=dataframe_sentiment_analyzed)
+
+    for index in dataframe_sentiment_analyzed.index:
+        result=sentiment_classifier(dataframe_sentiment_analyzed.loc[index, column_to_analyze].tolist())
         dataframe_sentiment_analyzed = _add_results_to_dataframe(dataframe=dataframe_sentiment_analyzed,result=result, index=index)
     
     dataframe_sentiment_analyzed['sentiment_score_per_element'] = dataframe_sentiment_analyzed['sentiment_score_per_element'].apply(_round_scores)
@@ -52,6 +76,7 @@ def _add_results_to_dataframe(dataframe, result, index):
     return dataframe
 
 def _create_sentiment_columns(dataframe):
+    """Creates three new columns storing the values of the sentiment analyzing."""
     dataframe["sentiment"]=None
     dataframe["sentiment_per_element"]=None
     dataframe["sentiment_score_per_element"]=None
