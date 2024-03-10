@@ -8,8 +8,6 @@ from final_project_schmidtfabian.config import BLD, PAPER_DIR
 documents = ["final_project_schmidtfabian"]
 
 for document in documents:
-
-    @pytask.mark.skip()
     @pytask.mark.try_last()
     @pytask.mark.latex(
         script=PAPER_DIR / f"{document}.tex",
