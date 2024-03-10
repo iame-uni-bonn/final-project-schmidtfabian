@@ -1,1 +1,0 @@
-The data for this project is located in this folder.

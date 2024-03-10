@@ -1,1 +1,0 @@
-The fine-tuned model of this project is located in this folder.
