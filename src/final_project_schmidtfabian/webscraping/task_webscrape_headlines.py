@@ -13,6 +13,6 @@ webscrape_headlines_deps = {
 
 def task_webscrape_headlines(depends_on = webscrape_headlines_deps,
                              produces = BLD / "data" / "dataset_headlines.arrow"):
-    starting_date = datetime(2008,1,1)
-    dataframe_headlines = webscrape_headlines_welt(starting_date=starting_date, number_of_days=1000)
+    starting_date = datetime(2023,1,7)
+    dataframe_headlines = webscrape_headlines_welt(starting_date=starting_date, number_of_days=200)
     dataframe_headlines.to_feather(produces)

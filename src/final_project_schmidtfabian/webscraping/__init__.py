@@ -1,1 +1,1 @@
-"""Code used for Web-scraping headlines from the german news website 'Die Welt'."""
+"""Code used for Web-scraping headlines from the German news website 'Die Welt'."""
