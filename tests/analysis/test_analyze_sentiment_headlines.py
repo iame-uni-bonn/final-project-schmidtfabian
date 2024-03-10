@@ -82,7 +82,7 @@ def test_analyze_sentiment_zero_shot_classification_wrong_datatype_elements_of_c
         )
 
 
-def test_analyze_sentiment_finetuned_model_wrong_datatype__elements_of_column():
+def test_analyze_sentiment_finetuned_model_wrong_datatype_elements_of_column():
     with pytest.raises(ValueError):
         analyze_sentiment_finetuned_model(
             dataframe_headlines=test_dataframe_wrong_datatypes_elements,
