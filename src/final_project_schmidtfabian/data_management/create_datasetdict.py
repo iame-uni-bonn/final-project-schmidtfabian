@@ -5,14 +5,15 @@ pd.options.mode.copy_on_write = True
 pd.options.future.infer_string = True
 
 def create_datasetdict(dataframe):
-    """
-    Creates a dataset dictionary containing a train, test and validation dataset.
+    """Creates a dataset dictionary containing a train, test and validation dataset.
 
     Args:
-    dataframe(pandas.Dataframe): A pandas dataframe containing the elements that should be seperated.
+        - dataframe(pandas.Dataframe): A pandas dataframe containing the elements that
+        should be seperated.
 
     Returns:
-    dataset_dict_headlines(DatasetDict)
+        - dataset_dict_headlines(DatasetDict)
+
     """
     _fail_if_invalid_input(dataframe=dataframe)
     train_df = dataframe.sample(frac=0.666666666, random_state=5)
@@ -56,7 +57,7 @@ def _fail_if_not_pandas_dataframe(dataframe):
         )
 
 def _fail_if_column_values_not_enough_elements(dataframe):
-    """Throws an error if the column 'values' has less than two elements."""
+    """Throws an error if the column 'values' has less than five elements."""
     length_values_column = len(dataframe.index)
     if length_values_column < 5:
         raise ValueError(f"Column 'values' needs to have at least five elements has {length_values_column}.")

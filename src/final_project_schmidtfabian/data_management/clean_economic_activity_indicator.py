@@ -4,17 +4,21 @@ pd.options.mode.copy_on_write = True
 pd.options.future.infer_string = True
 
 def clean_economic_activity_indicator(economic_indicator_dataframe):
-    """
-    Cleans the dataframe containing the economic activity indicator used in the rest of the project.
-    Converts the columns into the right datatypes, renames columns and sets the right index.
+    """Cleans economic indicator dataset.
+
+    Cleans the dataframe containing the economic activity indicator used in the rest
+    of the project. Converts the columns into the right datatypes, renames columns and
+    sets the right index.
 
     Args:
-    economic_indicator_dataframe(pd.Dataframe): A pandas dataframe containing the economic activity indicator.
+        - economic_indicator_dataframe(pd.Dataframe): A pandas dataframe containing
+        the economic activity indicator.
 
     Returns:
-    cleaned_data(pd.Dataframe)
+        - cleaned_data(pd.Dataframe)
+
     """
-    _fail_if_wrong_dataframe(economic_indicator_dataframe)
+    _fail_if_invalid_argument(economic_indicator_dataframe)
     cleaned_data = economic_indicator_dataframe.copy(deep = True)
     cleaned_data["Datum"] = pd.to_datetime(cleaned_data["Datum"], errors="raise", dayfirst=True)
     cleaned_data.rename(columns={"Datum": 'date'}, inplace=True)
@@ -25,10 +29,10 @@ def clean_economic_activity_indicator(economic_indicator_dataframe):
     return cleaned_data
 
 
-def _fail_if_wrong_dataframe(dataframe):
-    """Throws an error if argument is not a pandas dataframe containing the correct columns."""
-    _fail_if_not_pandas_dataframe(dataframe=dataframe)
-    _fail_if_not_contains_columns(dataframe=dataframe)
+def _fail_if_invalid_argument(argument):
+    """Throws an error if argument is invalid."""
+    _fail_if_not_pandas_dataframe(dataframe=argument)
+    _fail_if_not_contains_columns(dataframe=argument)
 
 
 
@@ -44,7 +48,7 @@ def _fail_if_not_pandas_dataframe(dataframe):
         )
 
 def _fail_if_not_contains_columns(dataframe):
-    """Throws an error if the columns 'Datum' and 'Kalender- und saisonbereinigt (KSB)' are not contained in the dataframe."""
+    """Throws an error if the right columns are not contained in the dataframe."""
     missing_columns = [col for col in ["Datum", "Kalender- und saisonbereinigt (KSB)"] if col not in dataframe.columns]
     if missing_columns:
         raise ValueError(f"Columns {', '.join(missing_columns)} not found in the DataFrame.")

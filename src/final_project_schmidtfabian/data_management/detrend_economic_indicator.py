@@ -6,19 +6,25 @@ pd.options.future.infer_string = True
 
 
 def detrend_economic_indicator(dataframe_economic_indicator):
-    """
-    This function detrends the economic activity indicator by using the Hodrick-Prescott filter. Since there do not exist any recommendations for the lambda value for the HP-filter, I use the Ravn & Uhlig formula and then adjust the value until the trend time-series looks close to the quarterly time-series.
-    This is because there are recommendations for the lambda value for quarterly time-series data.
+    """Detrends economic indicator.
+
+    Detrends the economic activity indicator by using the Hodrick-Prescott filter.
+    Uses the Ravn & Uhlig formula to pick a value for lambda.
+    
     Args:
-    dataframe_economic_indicator(pd.Dataframe): A cleaned pandas dataframe containing the economic indicator.
+        - dataframe_economic_indicator(pd.Dataframe): A cleaned pandas dataframe
+        containing the economic indicator.
 
     Returns:
-    detrended_data(pd.Dataframe)
+        - detrended_data(pd.Dataframe)
+
     """
     _fail_if_wrong_dataframe(dataframe=dataframe_economic_indicator)
     detrended_data = dataframe_economic_indicator.copy(deep = True)
     lambda_value=5.75*365**4
     detrended_data["cycle_values"], detrended_data["trend_values"] = sm.tsa.filters.hpfilter(detrended_data["values"].values, lamb=lambda_value)
+    detrended_data["cycle_values"] = detrended_data["cycle_values"].astype(pd.Float64Dtype())
+    detrended_data["trend_values"] = detrended_data["trend_values"].astype(pd.Float64Dtype())
     return detrended_data
 
 
@@ -46,7 +52,7 @@ def _fail_if_not_contain_column_values(dataframe):
         raise ValueError("Column 'values' not found in the DataFrame.")
     
 def _fail_if_wrong_datatype_column_values(dataframe):
-    """Throws an error if the column 'values' in the argument does not have the correct data type."""
+    """Throws an error if column 'values' does not have the correct data type."""
     actual_dtype = dataframe["values"].dtype
     if not isinstance(actual_dtype, pd.Float64Dtype):
         raise TypeError(f"Column 'values' has dtype {actual_dtype}, expected 'pd.Float64Dtype'.")
