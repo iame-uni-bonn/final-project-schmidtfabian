@@ -1,36 +1,51 @@
-from transformers import AutoTokenizer, TextClassificationPipeline, AutoModelForSequenceClassification, \
-    logging, TrainingArguments, Trainer
+import os
+
 import torch
 from datasets import Dataset, DatasetDict
 from sklearn.metrics import accuracy_score, f1_score
-import os
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    Trainer,
+    TrainingArguments,
+)
 
-def create_trainer_for_text_classification_model(saving_location_model,dataset_dict_headlines):
+
+def create_trainer_for_text_classification_model(
+    saving_location_model,
+    dataset_dict_headlines,
+):
     """Creates trainer for text-classification model.
 
     Creates a trainer instance that is then used to train the
     multilingual_sentiment_newspaper_headlines model by z-dickson. Specifies Arguments
     that load the best model at the end and set seeds to ensure reproducibility.
-    
-    Args:  
+
+    Args:
         - saving_location_model(Path): This is the path to the directory where the model should be saved at.
         - dataset_dict_headlines(DatasetDict): The dataset dictionary containing a train, and validation
         dataset used for training the model.
-        
+
     Returns:
         - trainer(transformers.Trainer)
-    
+
     """
-    _fail_invalid_inputs(saving_location=saving_location_model,
-                         datasetdict=dataset_dict_headlines)
-    dataset_dict_encoded = _tokenize_data_and_set_right_format(data=dataset_dict_headlines)
+    _fail_invalid_inputs(
+        saving_location=saving_location_model,
+        datasetdict=dataset_dict_headlines,
+    )
+    dataset_dict_encoded = _tokenize_data_and_set_right_format(
+        data=dataset_dict_headlines,
+    )
     batch_size = 50
     logging_steps = len(dataset_dict_encoded["train"]) // batch_size
-    model_name="z-dickson/multilingual_sentiment_newspaper_headlines"
+    model_name = "z-dickson/multilingual_sentiment_newspaper_headlines"
     num_labels = 3
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = AutoModelForSequenceClassification.from_pretrained(
-        model_name, num_labels=num_labels, from_tf=True
+        model_name,
+        num_labels=num_labels,
+        from_tf=True,
     ).to(device)
     training_args = TrainingArguments(
         output_dir=saving_location_model,
@@ -44,17 +59,16 @@ def create_trainer_for_text_classification_model(saving_location_model,dataset_d
         save_strategy="epoch",
         disable_tqdm=False,
         logging_steps=logging_steps,
-        seed= 451,
-        data_seed= 892
+        seed=451,
+        data_seed=892,
     )
-    trainer = Trainer(
+    return Trainer(
         model=model,
         args=training_args,
         compute_metrics=_compute_metrics,
         train_dataset=dataset_dict_encoded["train"],
         eval_dataset=dataset_dict_encoded["validation"],
     )
-    return trainer
 
 
 def _tokenize_data_and_set_right_format(data):
@@ -64,11 +78,13 @@ def _tokenize_data_and_set_right_format(data):
     return data_encoded
 
 
-
 def _tokenize(batch):
     """Tokenizes a batch of text using the specified tokenizer."""
-    tokenizer = AutoTokenizer.from_pretrained("z-dickson/multilingual_sentiment_newspaper_headlines")
+    tokenizer = AutoTokenizer.from_pretrained(
+        "z-dickson/multilingual_sentiment_newspaper_headlines",
+    )
     return tokenizer(batch["text"], padding=True, truncation=True)
+
 
 def _compute_metrics(pred):
     """Computes macro f1-score and accuracy score using model's predictions."""
@@ -77,6 +93,7 @@ def _compute_metrics(pred):
     f1 = f1_score(labels, preds, average="macro")
     acc = accuracy_score(labels, preds)
     return {"accuracy": acc, "f1": f1}
+
 
 def _fail_invalid_inputs(saving_location, datasetdict):
     _fail_if_saving_location_finetuned_model_is_not_a_filepath(saving_location)
@@ -87,20 +104,36 @@ def _fail_invalid_inputs(saving_location, datasetdict):
 
 
 def _fail_if_saving_location_finetuned_model_is_not_a_filepath(
-        location_finetuned_model
-        ):
+    location_finetuned_model,
+):
     if not os.path.isabs(location_finetuned_model):
-        raise TypeError("'location_finetuned_model' has to be a valid absolute path.")
-    
+        msg = "'location_finetuned_model' has to be a valid absolute path."
+        raise TypeError(msg)
+
+
 def _fail_if_wrong_dtype_datasetdict(dataset_dict):
     if not isinstance(dataset_dict, DatasetDict):
-        raise TypeError(f"'dataset_dict_headlines' has to be a DatasetDict \
-                        object, is currently '{type(dataset_dict)}'.")
+        msg = (
+            "'dataset_dict_headlines' has to be a DatasetDict"
+            f" object, is currently '{type(dataset_dict)}'."
+        )
+        raise TypeError(
+            msg,
+        )
+
 
 def _fail_if_no_dataset_train_and_validation(dataset_dict):
     if "train" not in dataset_dict or "validation" not in dataset_dict:
-        missing_datasets = [dataset_name for dataset_name in ["train", "validation"] if dataset_name not in dataset_dict]
-        raise ValueError(f"DatasetDict is missing the following datasets: {', '.join(missing_datasets)}.")
+        missing_datasets = [
+            dataset_name
+            for dataset_name in ["train", "validation"]
+            if dataset_name not in dataset_dict
+        ]
+        msg = f"DatasetDict is missing the following datasets: {', '.join(missing_datasets)}."
+        raise ValueError(
+            msg,
+        )
+
 
 def _fail_if_wrong_input_dataset(dataset):
     _fail_if_wrong_dtype(dataset=dataset)
@@ -108,25 +141,46 @@ def _fail_if_wrong_input_dataset(dataset):
     _fail_if_column_text_is_not_a_string(dataset=dataset)
     _fail_if_column_label_is_not_int(dataset=dataset)
 
+
 def _fail_if_wrong_dtype(dataset):
     if not isinstance(dataset, Dataset):
-        raise TypeError(f"'test_data_datasetdict_headlines' has to be a DataSet \
-                        object, is currently '{type(dataset)}'.")
-    
+        msg = (
+            "'test_data_datasetdict_headlines' has to be a DataSet"
+            f" object, is currently '{type(dataset)}'."
+        )
+        raise TypeError(
+            msg,
+        )
+
+
 def _fail_if_wrong_columns(dataset):
-    missing_columns = [col for col in ["text", "label"] if col not\
-                        in dataset.column_names]
+    missing_columns = [
+        col for col in ["text", "label"] if col not in dataset.column_names
+    ]
     if missing_columns:
-        raise ValueError(f"Column(s) '{missing_columns}' not found in the dataset.")
-    
+        msg = f"Column(s) '{missing_columns}' not found in the dataset."
+        raise ValueError(msg)
+
+
 def _fail_if_column_text_is_not_a_string(dataset):
     column_dtype = dataset.features["text"].dtype
-    if column_dtype != 'large_string':
-        raise ValueError(f"Column 'text' does not have datatype string,\
-                          its datatype is {column_dtype}.")
+    if column_dtype != "large_string":
+        msg = (
+            "Column 'text' does not have datatype string,"
+            f" its datatype is {column_dtype}."
+        )
+        raise ValueError(
+            msg,
+        )
+
 
 def _fail_if_column_label_is_not_int(dataset):
     column_dtype = dataset.features["label"].dtype
-    if column_dtype != 'int64':
-        raise ValueError(f"Column 'label' does not have datatype 'int64',\
-                          its datatype is {column_dtype}.")
+    if column_dtype != "int64":
+        msg = (
+            "Column 'label' does not have datatype 'int64',"
+            f" its datatype is {column_dtype}."
+        )
+        raise ValueError(
+            msg,
+        )

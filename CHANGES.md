@@ -9,4 +9,4 @@ This file lists the main changes of this version of the project compared to the 
 5. To all functions at least a couple of tests were added.
 6. The code was reformatted to fit good software engeering practices including renaming variables, writing functions and subfunctions and so on.
 7. The webscraping part of the project was revisited and the code greatly improved in efficiency and clarity. A new way to webscrape data was implemented.
-8. A new timeframe for 
+8. A new timeframe for

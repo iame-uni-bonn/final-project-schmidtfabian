@@ -12,6 +12,7 @@ pdbcls = "pdbp:Pdb"
 target-version = "py311"
 select = ["ALL"]
 fix = true
+show-fixes = true
 fix-only = true # No linting errors will be reported
 extend-ignore = [
     "S101",  # Use of `assert` detected.

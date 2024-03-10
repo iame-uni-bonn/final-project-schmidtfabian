@@ -1,17 +1,21 @@
-from transformers import AutoTokenizer, TextClassificationPipeline, AutoModelForSequenceClassification
-import numpy as np
 import pandas as pd
-from datasets import Dataset
 import torch
+from datasets import Dataset
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    TextClassificationPipeline,
+)
 
 pd.options.mode.copy_on_write = True
 pd.options.future.infer_string = True
 
 from final_project_schmidtfabian.config import BLD
 
+
 def create_labels_for_summary_statistics(test_data_datasetdict_headlines):
     """Create labels for summary statistics from the training process.
-    
+
     Creates a dataframe containing three columns: one containing the hand-labelled
     sentiment, one containing the sentiment assigned by the fine-tuned model and one
     containing the sentiment assigned by the zero-shot classification model.
@@ -26,50 +30,52 @@ def create_labels_for_summary_statistics(test_data_datasetdict_headlines):
 
     """
     _fail_if_wrong_input(dataset=test_data_datasetdict_headlines)
-    tokenizer = AutoTokenizer\
-        .from_pretrained("z-dickson/multilingual_sentiment_newspaper_headlines")
-    model_zero_shot_classification = AutoModelForSequenceClassification\
-        .from_pretrained("z-dickson/multilingual_sentiment_newspaper_headlines",
-                                                               from_tf=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        "z-dickson/multilingual_sentiment_newspaper_headlines",
+    )
+    model_zero_shot_classification = AutoModelForSequenceClassification.from_pretrained(
+        "z-dickson/multilingual_sentiment_newspaper_headlines",
+        from_tf=True,
+    )
     sentiment_classifier_zero_shot_classification = TextClassificationPipeline(
         tokenizer=tokenizer,
         model=model_zero_shot_classification,
-        device="cuda:0" if torch.cuda.is_available() else None
-        )
+        device="cuda:0" if torch.cuda.is_available() else None,
+    )
     model_finetuned = AutoModelForSequenceClassification.from_pretrained(
-        BLD / "finetuned_text_classification_model" / "checkpoint-4"
-        )
+        BLD / "finetuned_text_classification_model" / "checkpoint-4",
+    )
     sentiment_classifier_finetuned_model = TextClassificationPipeline(
         tokenizer=tokenizer,
         model=model_finetuned,
         device="cuda:0" if torch.cuda.is_available() else None,
-        framework="pt"
-        )
+        framework="pt",
+    )
     sentiment_labels_finetuned_model = pd.DataFrame(
-        sentiment_classifier_finetuned_model(test_data_datasetdict_headlines["text"])
-        )
-    label_sentiment_to_int = {
-        "negative": 0,
-        "neutral": 1,
-        "positive": 2
-    }
-    sentiment_labels_int_finetuned_model = sentiment_labels_finetuned_model["label"].map(
-        label_sentiment_to_int
-        )
+        sentiment_classifier_finetuned_model(test_data_datasetdict_headlines["text"]),
+    )
+    label_sentiment_to_int = {"negative": 0, "neutral": 1, "positive": 2}
+    sentiment_labels_int_finetuned_model = sentiment_labels_finetuned_model[
+        "label"
+    ].map(label_sentiment_to_int)
     sentiment_labels_zero_shot_classification = pd.DataFrame(
-        sentiment_classifier_zero_shot_classification(test_data_datasetdict_headlines["text"])
-        )
-    sentiment_labels_int_zero_shot_classification =\
-        sentiment_labels_zero_shot_classification["label"].map(
-        label_sentiment_to_int
-        )
+        sentiment_classifier_zero_shot_classification(
+            test_data_datasetdict_headlines["text"],
+        ),
+    )
+    sentiment_labels_int_zero_shot_classification = (
+        sentiment_labels_zero_shot_classification["label"].map(label_sentiment_to_int)
+    )
     dataframe_labels_test_data = pd.DataFrame()
     dataframe_labels_test_data["label"] = test_data_datasetdict_headlines["label"]
-    dataframe_labels_test_data["label finetuned model"] =\
-    sentiment_labels_int_finetuned_model 
-    dataframe_labels_test_data["label zero_shot_classification model"] =\
-    sentiment_labels_int_zero_shot_classification
+    dataframe_labels_test_data[
+        "label finetuned model"
+    ] = sentiment_labels_int_finetuned_model
+    dataframe_labels_test_data[
+        "label zero_shot_classification model"
+    ] = sentiment_labels_int_zero_shot_classification
     return dataframe_labels_test_data
+
 
 def _fail_if_wrong_input(dataset):
     _fail_if_wrong_dtype(dataset=dataset)
@@ -77,25 +83,46 @@ def _fail_if_wrong_input(dataset):
     _fail_if_column_text_is_not_a_string(dataset=dataset)
     _fail_if_column_label_is_not_int(dataset=dataset)
 
+
 def _fail_if_wrong_dtype(dataset):
     if not isinstance(dataset, Dataset):
-        raise TypeError(f"'test_data_datasetdict_headlines' has to be a DataSet \
-                        object, is currently '{type(dataset)}'.")
-    
+        msg = (
+            "'test_data_datasetdict_headlines' has to be a DataSet"
+            f"object, is currently '{type(dataset)}'."
+        )
+        raise TypeError(
+            msg,
+        )
+
+
 def _fail_if_wrong_columns(dataset):
-    missing_columns = [col for col in ["text", "label"] if col not\
-                        in dataset.column_names]
+    missing_columns = [
+        col for col in ["text", "label"] if col not in dataset.column_names
+    ]
     if missing_columns:
-        raise ValueError(f"Column(s) '{missing_columns}' not found in the dataset.")
-    
+        msg = f"Column(s) '{missing_columns}' not found in the dataset."
+        raise ValueError(msg)
+
+
 def _fail_if_column_text_is_not_a_string(dataset):
     column_dtype = dataset.features["text"].dtype
-    if column_dtype != 'large_string':
-        raise ValueError(f"Column 'text' does not have datatype string,\
-                          its datatype is {column_dtype}.")
+    if column_dtype != "large_string":
+        msg = (
+            "Column 'text' does not have datatype string,"
+            f" its datatype is {column_dtype}."
+        )
+        raise ValueError(
+            msg,
+        )
+
 
 def _fail_if_column_label_is_not_int(dataset):
     column_dtype = dataset.features["label"].dtype
-    if column_dtype != 'int64':
-        raise ValueError(f"Column 'label' does not have datatype 'int64',\
-                          its datatype is {column_dtype}.")
+    if column_dtype != "int64":
+        msg = (
+            "Column 'label' does not have datatype 'int64',"
+            f" its datatype is {column_dtype}."
+        )
+        raise ValueError(
+            msg,
+        )
