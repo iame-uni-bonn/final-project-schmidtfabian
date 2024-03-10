@@ -38,4 +38,4 @@ dependencies:
   - pytorch
   - torchtext
   - huggingface_hub[cli]
-  - pip: [-e ., kaleido, pdbp, tensorflow]
+  - pip: [-e ., kaleido, pdbp, tensorflow, tf-keras]
