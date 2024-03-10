@@ -28,11 +28,11 @@ for model in ["VAR", "ARIMA"]:
         produces=plot_forecasts_products,
         model=model,
     ):
-        """Plots forecasts of both time-series models for cycle values."""
+        """Plots forecasts of both time-series models."""
         train = pd.read_feather(depends_on["train dataframe merged data"])
         test = pd.read_feather(depends_on["test dataframe merged data"])
         model_forecasts = pd.read_feather(depends_on["forecasts data"])
-        trace_training_data = go.Scatter(
+        trace_training_data_cycle = go.Scatter(
             x=train.index,
             y=train["cycle_values"],
             mode="lines",
@@ -40,7 +40,7 @@ for model in ["VAR", "ARIMA"]:
             line={"color": "blue"},
         )
 
-        trace_forecast_data = go.Scatter(
+        trace_forecast_data_cycle = go.Scatter(
             x=model_forecasts.index,
             y=model_forecasts["forecast_cycle_values"],
             mode="lines",
@@ -48,7 +48,7 @@ for model in ["VAR", "ARIMA"]:
             line={"color": "green"},
         )
 
-        trace_test_data = go.Scatter(
+        trace_test_data_cycle = go.Scatter(
             x=test.index,
             y=test["cycle_values"],
             mode="lines",
@@ -62,11 +62,15 @@ for model in ["VAR", "ARIMA"]:
             yaxis={"title": "Cycle Values Truck Toll Mileage Index"},
             showlegend=True,
         )
-        figure_forecasts_model = go.Figure(
-            data=[trace_training_data, trace_forecast_data, trace_test_data],
+        figure_forecasts_model_cycle = go.Figure(
+            data=[
+                trace_training_data_cycle,
+                trace_forecast_data_cycle,
+                trace_test_data_cycle,
+            ],
             layout=figure_layout,
         )
-        figure_forecasts_model.write_image(produces["plot forecasts"])
+        figure_forecasts_model_cycle.write_image(produces["plot forecasts"])
 
         mse_forecasts_seven_days = mean_squared_error(
             test["cycle_values"][:6],
@@ -76,3 +80,45 @@ for model in ["VAR", "ARIMA"]:
             mse_forecasts_seven_days,
             produces["mse seven days forecast"],
         )
+        if model == "VAR":
+            trace_training_data_sentiment = go.Scatter(
+                x=train.index,
+                y=train["sentiment"],
+                mode="lines",
+                name="training data",
+                line={"color": "blue"},
+            )
+
+            trace_forecast_data_sentiment = go.Scatter(
+                x=model_forecasts.index,
+                y=model_forecasts["forecast_sentiment"],
+                mode="lines",
+                name="forecasts",
+                line={"color": "green"},
+            )
+
+            trace_test_data_sentiment = go.Scatter(
+                x=test.index,
+                y=test["sentiment"],
+                mode="lines",
+                name="test data",
+                line={"color": "red"},
+            )
+
+            figure_layout = go.Layout(
+                title=f"Test vs. Forecast Values: Sentiment || {model} model",
+                xaxis={"title": "Dates"},
+                yaxis={"title": "Sentiment Values"},
+                showlegend=True,
+            )
+            figure_sentiment_forecasts_model = go.Figure(
+                data=[
+                    trace_training_data_sentiment,
+                    trace_forecast_data_sentiment,
+                    trace_test_data_sentiment,
+                ],
+                layout=figure_layout,
+            )
+            figure_sentiment_forecasts_model.write_image(
+                BLD / "figures" / "VAR_forecasts_sentiment.png",
+            )
